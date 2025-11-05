@@ -469,6 +469,66 @@
         document.body.appendChild(aviso);
     }
 
+  // ... (Linhas anteriores do script)
+
+    // ====================================================================
+    // ⚠️ ATENÇÃO: COLOQUE A SUA NOVA URL DE IMPLANTAÇÃO AQUI:
+    const APPS_SCRIPT_URL_WEBHOOK = 'SEU_NOVO_URL_DE_EXECUÇÃO_AQUI'; 
+    // Ex: 'https://script.google.com/macros/s/AKfycbz123ABCxyz/exec'; 
+    // ====================================================================
+
+    const reservas = {};
+// ... (restante do script)
+    
+    // --- LÓGICA DE SUBMISSÃO AGORA CHAMA O APPS SCRIPT ---
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        // ... (Validações e preparação de dados)
+        
+        // Dados validados
+        const dadosReserva = { /* ... */ };
+
+        try {
+            // 1. ENVIA OS DADOS DA RESERVA PARA O SEU SERVIDOR GRATUITO (APPS SCRIPT)
+            const response = await fetch(APPS_SCRIPT_URL_WEBHOOK, {
+                method: 'POST',
+                // *** MUDANÇA ESSENCIAL: ADICIONANDO 'no-cors' ***
+                mode: 'no-cors', 
+                headers: { 
+                    'Content-Type': 'application/json' 
+                    // Note: 'no-cors' fará com que o navegador ignore o cabeçalho Content-Type, mas precisamos mantê-lo para o Apps Script
+                },
+                body: JSON.stringify(dadosReserva)
+            });
+            
+            // ATENÇÃO: Com 'no-cors', a propriedade 'response.ok' sempre será 'false' 
+            // e o 'response.status' sempre será '0'. 
+            // A ÚNICA MANEIRA DE SABER SE O APPS SCRIPT RECEBEU É VERIFICANDO OS LOGS DE EXECUÇÃO
+            // OU ASSUMINDO SUCESSO.
+
+            // 2. INICIA O MONITORAMENTO DO SINAL
+            // Assumimos que a requisição *chegou* ao Apps Script e iniciamos o monitoramento.
+            // Se o App Script falhar internamente (Ex: erro de Firebase), ele não vai escrever, 
+            // e o usuário ficará no modal aguardando. Isso é o comportamento esperado para 'no-cors'.
+            
+            const reservaId = 'RSV-' + new Date().getTime().toString().slice(-6); // Gera o ID no frontend
+            
+            monitorarConfirmacao(reservaId, dadosReserva);
+            mostrarModalPix(valorTotal, aluno, turma, nome, cadeirasExtras, mesasSelecionadas, reservaId); 
+            
+            // A PARTIR DAQUI, DEPENDEMOS DO APPS SCRIPT PARA GRAVAR O DADO
+
+        } catch (error) {
+            console.error("Erro FATAL na requisição ao Apps Script:", error);
+            alert(`Erro na requisição ao Apps Script. Verifique se o Netlify está com o NOVO URL de implantação do Apps Script.`);
+        }
+        
+        selecionadas.clear();
+        form.reset();
+        atualizarTotal();
+    });
+// ... (restante do script)
+
 </script>
 </body>
 </html>
