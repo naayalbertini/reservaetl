@@ -142,7 +142,9 @@
 </head>
 <body>
   <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 1rem; flex-wrap: wrap;">
+    <img src="img/tracos.png" alt="Escola Traços e Letras" style="height: 60px;">
     <h1 style="margin: 0; font-weight: 300; font-size: 2rem; text-align: center;">Reserva de Mesas - Traços Culturais</h1>
+    <img src="img/gaudi.png" alt="Colégio Antoni Gaudí" style="height: 100px;">
   </div>
 
 
@@ -173,7 +175,17 @@
 
   <div id="pixModal" class="modal">
     <div class="modal-content">
-      </div>
+      <span class="close-button" onclick="fecharModal()">&times;</span>
+      <h2>Pagamento via PIX</h2>
+      <p><strong>Valor:</strong> <span id="pixValor"></span></p>
+      <p><strong>Chave Pix:</strong> <span id="pixChave">45.701.401/0001-07</span></p>
+      <p><strong>Nome:</strong> Colégio Antoni Gaudi</p>
+      <button onclick="copiarChavePix()">Copiar chave Pix</button>
+    <p style="margin-top: 1rem; font-size: 0.95rem; color: #ccc;">
+      ⏰ <strong>Importante:</strong> sua reserva será <strong>mantida por até 48 horas</strong>.<br>
+      Se o pagamento não for confirmado nesse prazo, as mesas serão disponibilizadas novamente.
+    </p><br><br><button onclick="enviarWhatsapp()">📲 Enviar reserva pelo WhatsApp</button>
+    </div>
   </div>
 
   <form id="formReserva">
@@ -227,12 +239,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    
-    // ====================================================================
-    // ⚠️ ATENÇÃO: COLOQUE A SUA NOVA URL DE IMPLANTAÇÃO AQUI:
-    const APPS_SCRIPT_URL_WEBHOOK = 'https://script.google.com/macros/s/AKfycbxQpLVSBUeuBD_rFz76xS54CtI7WKYKCPTMTPhFeO2y_LgvwrBK5Zr8SzBpfHtkbCKU/exec'; 
-    // Ex: 'https://script.google.com/macros/s/AKfycbz123ABCxyz/exec'; 
-    // ====================================================================
 
     const reservas = {};
     const selecionadas = new Set();
@@ -250,214 +256,145 @@
     }
 
     function atualizarGrid() {
-        mesasContainer.innerHTML = "";
-        for (let i = 0; i < totalMesas; i++) {
-            const posicao = i % 6;
+  mesasContainer.innerHTML = "";
+  for (let i = 0; i < totalMesas; i++) {
+    const posicao = i % 6;
 
-            if (posicao === 3) {
-                const espaco = document.createElement("div");
-                espaco.className = "mesa espaco";
-                mesasContainer.appendChild(espaco);
-            }
-
-            const numero = (i + 1).toString().padStart(2, '0');
-            const div = document.createElement("div");
-            div.textContent = numero;
-            div.className = "mesa";
-
-            if (reservas[numero]) {
-                div.classList.add("reservada");
-                div.title = `Reservado por: ${reservas[numero].aluno} - ${reservas[numero].turma} (Resp: ${reservas[numero].nome})`;
-            } else {
-                if (selecionadas.has(numero)) div.classList.add("selecionada");
-                div.addEventListener("click", () => {
-                    if (selecionadas.has(numero)) selecionadas.delete(numero);
-                    else selecionadas.add(numero);
-                    atualizarGrid();
-                    atualizarTotal();
-                });
-            }
-            mesasContainer.appendChild(div);
-        }
+    // espaço central após 3 mesas
+    if (posicao === 3) {
+      const espaco = document.createElement("div");
+      espaco.className = "mesa espaco";
+      mesasContainer.appendChild(espaco);
     }
 
-    onValue(ref(db, "reservas"), (snapshot) => {
-        Object.assign(reservas, snapshot.val() || {});
+    const numero = (i + 1).toString().padStart(2, '0');
+    const div = document.createElement("div");
+    div.textContent = numero;
+    div.className = "mesa";
+
+    if (reservas[numero]) {
+      div.classList.add("reservada");
+      div.title = `Reservado por: ${reservas[numero].aluno} - ${reservas[numero].turma} (Resp: ${reservas[numero].nome})`;
+    } else {
+      if (selecionadas.has(numero)) div.classList.add("selecionada");
+      div.addEventListener("click", () => {
+        if (selecionadas.has(numero)) selecionadas.delete(numero);
+        else selecionadas.add(numero);
         atualizarGrid();
+        atualizarTotal();
+      });
+    }
+
+    mesasContainer.appendChild(div);
+  }
+}
+
+    onValue(ref(db, "reservas"), (snapshot) => {
+      Object.assign(reservas, snapshot.val() || {});
+      atualizarGrid();
     });
 
     cadeirasInput.addEventListener("input", atualizarTotal);
 
-    // --- LÓGICA DE SUBMISSÃO AGORA CHAMA O APPS SCRIPT COM NO-CORS ---
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const aluno = document.getElementById("aluno").value;
-        const turma = document.getElementById("turma").value;
-        const nome = document.getElementById("nome").value;
-        const cadeirasExtras = parseInt(cadeirasInput.value);
-        const mesasSelecionadas = Array.from(selecionadas);
-
-        if (cadeirasExtras > 2) {
-            alert("Só é permitido reservar no máximo 2 cadeiras extras.");
-            return;
-        }
-        if (mesasSelecionadas.length === 0) {
-            alert("Você precisa selecionar pelo menos uma mesa.");
-            return;
-        }
-
-        const jaReservadas = mesasSelecionadas.filter(m => reservas[m]);
-        if (jaReservadas.length > 0) {
-            alert("Mesas já reservadas: " + jaReservadas.join(", "));
-            return;
-        }
-
-        const valorTotal = mesasSelecionadas.length * 120 + cadeirasExtras * 10;
-        const reservaId = 'RSV-' + new Date().getTime().toString().slice(-6); // ID Gerado no Frontend
-
-        const dadosReserva = {
-            reservaId, // Enviamos o ID
-            aluno,
-            turma,
-            nome,
-            cadeirasExtras,
-            valorTotal,
-            mesasSelecionadas
-        };
-
-        try {
-            // 1. ENVIA OS DADOS DA RESERVA PARA O SEU SERVIDOR GRATUITO (APPS SCRIPT)
-            await fetch(APPS_SCRIPT_URL_WEBHOOK, {
-                method: 'POST',
-                // *** CORREÇÃO ESSENCIAL: RESOLVE O 'Failed to fetch' ***
-                mode: 'no-cors', 
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dadosReserva)
-            });
-            
-            // 2. INICIA O MONITORAMENTO DO SINAL
-            // Assumimos que a requisição chegou ao Apps Script e iniciamos o monitoramento.
-            monitorarConfirmacao(reservaId, dadosReserva);
-            
-            // 3. MOSTRA O MODAL PIX (COM O ID PARA O CLIENTE)
-            mostrarModalPix(valorTotal, aluno, turma, nome, cadeirasExtras, mesasSelecionadas, reservaId); 
-            
-        } catch (error) {
-            console.error("Erro FATAL na requisição ao Apps Script:", error);
-            alert(`Erro na requisição ao Apps Script. Verifique se o Netlify está com o NOVO URL de implantação do Apps Script.`);
-        }
-        
-        selecionadas.clear();
-        form.reset();
-        atualizarTotal();
-    });
-
-    // --- FUNÇÃO DE TEMPO REAL: OUVE O SINAL DO APPS SCRIPT NO FIREBASE ---
-    function monitorarConfirmacao(reservaId, dadosReserva) {
-        // Ouve o nó: /pagamentos_confirmados/{reservaId}
-        const confirmacaoRef = ref(db, `pagamentos_confirmados/${reservaId}`);
-
-        // Variável para armazenar a função de callback e permitir que seja desligada
-        let offFunction;
-
-        offFunction = onValue(confirmacaoRef, (snapshot) => {
-            const confirmacao = snapshot.val();
-            
-            if (confirmacao && confirmacao.status === 'PAGO') {
-                // Desliga o monitoramento (remove o listener)
-                offFunction(); 
-                
-                // 1. BLOQUEIA AS MESAS DE FORMA PERMANENTE (NÓ /reservas)
-                for (const mesa of dadosReserva.mesasSelecionadas) {
-                    set(ref(db, `reservas/${mesa}`), dadosReserva);
-                }
-                
-                // 2. GERA O TICKET INSTANTANEAMENTE PARA O CLIENTE
-                fecharModal();
-                gerarTicket(dadosReserva, reservaId); 
-            }
-        });
-        confirmacaoRef.off = offFunction; 
-    }
-
-    // --- FUNÇÃO QUE GERA O TICKET FINAL ---
-    window.gerarTicket = function(reserva, reservaId) {
-        const ticketHtml = `
-            <div style="max-width: 600px; margin: 40px auto; background-color: #f0f0f0; color: #333; padding: 25px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-                <h2 style="color: #008634; text-align: center;">✅ RESERVA CONFIRMADA</h2>
-                <p style="text-align: center; font-size: 1.2rem;">ID da Reserva: <strong>${reservaId}</strong></p>
-                <hr style="border-top: 1px solid #ccc;">
-                <p><strong>Evento:</strong> Traços Culturais</p>
-                <p><strong>Aluno:</strong> ${reserva.aluno}</p>
-                <p><strong>Responsável:</strong> ${reserva.nome}</p>
-                <p><strong>Turma:</strong> ${reserva.turma}</p>
-                <p><strong>Mesa(s) Reservada(s):</strong> ${reserva.mesasSelecionadas.join(', ')}</p>
-                <p><strong>Cadeiras Extras:</strong> ${reserva.cadeirasExtras}</p>
-                <p><strong>Valor Pago:</strong> R$ ${reserva.valorTotal.toFixed(2).replace('.', ',')}</p>
-            </div>
-            <button onclick="window.print()" style="margin-top: 15px; display: block; width: 300px; margin: 20px auto; padding: 12px; background-color: #008634; color: white; border: none; border-radius: 6px;">Imprimir Ticket</button>
-        `;
-        document.body.innerHTML = ticketHtml; 
-    }
     
-    // --- FUNÇÃO MODAL ATUALIZADA (AGORA RECEBE O ID) ---
+    form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const aluno = document.getElementById("aluno").value;
+  const turma = document.getElementById("turma").value;
+  const nome = document.getElementById("nome").value;
+  const cadeirasExtras = parseInt(cadeirasInput.value);
+  const mesasSelecionadas = Array.from(selecionadas);
+
+  if (cadeirasExtras > 2) {
+    alert("Só é permitido reservar no máximo 2 cadeiras extras.");
+    return;
+  }
+  if (mesasSelecionadas.length === 0) {
+    alert("Você precisa selecionar pelo menos uma mesa.");
+    return;
+  }
+
+  const jaReservadas = mesasSelecionadas.filter(m => reservas[m]);
+  if (jaReservadas.length > 0) {
+    alert("Mesas já reservadas: " + jaReservadas.join(", "));
+    return;
+  }
+
+  const agora = new Date();
+  const valorTotal = mesasSelecionadas.length * 120 + cadeirasExtras * 10;
+
+  for (const mesa of mesasSelecionadas) {
+    await set(ref(db, `reservas/${mesa}`), {
+      aluno,
+      turma,
+      nome,
+      cadeirasExtras,
+      valorTotal,
+      mesasSelecionadas,
+      horario: agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+      data: agora.toLocaleDateString('pt-BR')
+    });
+  }
+
+  mostrarModalPix(valorTotal, aluno, turma, nome, cadeirasExtras, mesasSelecionadas);
+
+  selecionadas.clear();
+  form.reset();
+  atualizarTotal();
+});
+
+
+
+
+
+    atualizarTotal();
+
     let mensagemWhatsApp = "";
-    window.mostrarModalPix = function(valor, aluno, turma, nome, cadeirasExtras, mesasSelecionadas, reservaId) {
-        document.getElementById("pixModal").querySelector('.modal-content').innerHTML = `
-            <span class="close-button" onclick="fecharModal()">&times;</span>
-            <h2>Pagamento via PIX - Reserva ID: ${reservaId}</h2>
-            <p><strong>Valor:</strong> <span id="pixValor">R$ ${valor.toFixed(2).replace('.', ',')}</span></p>
-            <p><strong>Chave Pix (CNPJ):</strong> <span>45.701.401/0001-07</span></p>
-            <p><strong>Nome:</strong> Colégio Antoni Gaudi</p>
-            <button onclick="copiarChavePix()">Copiar chave Pix</button>
-            <p style="margin-top: 1rem; font-size: 0.95rem; color: #ccc;">
-                1. Pague o Pix acima.<br>
-                2. Envie o comprovante via WhatsApp, mencionando o ID: <strong>${reservaId}</strong>.
-            </p>
-            <button onclick="enviarWhatsapp()" style="background-color: #25D366; color: white;">📲 Enviar comprovante pelo WhatsApp</button>
-            <p style="margin-top: 1rem; font-weight: bold; color: #ffeb3b;">AGUARDE: Seu ticket de confirmação será gerado nesta página assim que o Apps Script receber o sinal de pagamento.</p>
-        `; 
-
-        // Atualiza a mensagem do WhatsApp com o ID
-        mensagemWhatsApp = `Olá!%0AGostaria de confirmar a reserva para o evento Traços Culturais.%0A%0A*ID da Reserva:* ${reservaId}%0AAluno: ${aluno}%0ATurma: ${turma}%0AResponsável: ${nome}%0AMesas: ${mesasSelecionadas.join(", ")}%0ACadeiras Extras: ${cadeirasExtras}%0AValor Total: R$ ${valor.toFixed(2).replace('.', ',')}%0A%0A*ANEXAR COMPROVANTE AQUI*`;
-
-        document.getElementById("pixModal").style.display = "flex";
+window.mostrarModalPix = function(valor, aluno, turma, nome, cadeirasExtras, mesasSelecionadas) {
+      document.getElementById("pixValor").innerText = `R$ ${valor.toFixed(2).replace('.', ',')}`;
+      mensagemWhatsApp = `Olá!%0AGostaria de confirmar a reserva para o evento Traços Culturais.%0A%0AAluno: ${aluno}%0ATurma: ${turma}%0AResponsável: ${nome}%0AMesas: ${mesasSelecionadas.join(", ")}%0ACadeiras Extras: ${cadeirasExtras}%0AValor Total: R$ ${valor.toFixed(2).replace('.', ',')}`;
+document.getElementById("pixModal").style.display = "flex";
     }
 
-    // --- FUNÇÕES GLOBAIS EXISTENTES ---
     window.fecharModal = function() {
-        document.getElementById("pixModal").style.display = "none";
+      document.getElementById("pixModal").style.display = "none";
     }
 
     window.enviarWhatsapp = function() {
-        window.open(`https://wa.me/5571999183320?text=${mensagemWhatsApp}`, '_blank');
-    };
+  window.open(`https://wa.me/5571999183320?text=${mensagemWhatsApp}`, '_blank');
+};
 
-    window.copiarChavePix = function() {
-        navigator.clipboard.writeText("45.701.401/0001-07").then(() => {
-            alert("Chave Pix copiada!");
-        });
+window.copiarChavePix = function() {
+      navigator.clipboard.writeText("45.701.401/0001-07").then(() => {
+        alert("Chave Pix copiada!");
+      });
     }
 
-    // --- BLOQUEIO DE HORÁRIO ---
-    atualizarTotal();
     const agora = new Date();
-    const totalMinutos = agora.getHours() * 60 + agora.getMinutes();
+const hora = agora.getHours();
+const minutos = agora.getMinutes();
 
-    // 07:00 = 420 minutos / 15:30 = 930 minutos
-    if (totalMinutos < 420 || totalMinutos >= 1400) {
-        mesasContainer.style.display = "none";
-        form.style.display = "none";
+// Convertendo hora e minuto para minutos totais do dia
+const totalMinutos = hora * 60 + minutos;
 
-        const aviso = document.createElement("div");
-        aviso.style.color = "white";
-        aviso.style.textAlign = "center";
-        aviso.style.marginTop = "50px";
-        aviso.style.fontSize = "1.2rem";
-        aviso.innerHTML = "⏰ O sistema de reservas funciona entre <strong>07:00 e 15:30</strong>. Tente novamente nesse horário!";
-        document.body.appendChild(aviso);
-    }
+// 07:00 = 420 minutos / 15:30 = 930 minutos
+if (totalMinutos < 420 || totalMinutos >= 1400) {
 
-</script>
+
+  // Oculta a grid e o formulário
+  mesasContainer.style.display = "none";
+  form.style.display = "none";
+
+  // Cria e exibe mensagem de aviso
+  const aviso = document.createElement("div");
+  aviso.style.color = "white";
+  aviso.style.textAlign = "center";
+  aviso.style.marginTop = "50px";
+  aviso.style.fontSize = "1.2rem";
+  aviso.innerHTML = "⏰ O sistema de reservas funciona entre <strong>07:00 e 15:30</strong>. Tente novamente nesse horário!";
+  document.body.appendChild(aviso);
+}
+
+ </script>
 </body>
 </html>
