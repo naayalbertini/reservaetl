@@ -142,9 +142,7 @@
 </head>
 <body>
   <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 1rem; flex-wrap: wrap;">
-    <img src="img/tracos.png" alt="Escola Traços e Letras" style="height: 60px;">
     <h1 style="margin: 0; font-weight: 300; font-size: 2rem; text-align: center;">Reserva de Mesas - Traços Culturais</h1>
-    <img src="img/gaudi.png" alt="Colégio Antoni Gaudí" style="height: 100px;">
   </div>
 
 
@@ -231,9 +229,9 @@
     const db = getDatabase(app);
     
     // ====================================================================
-    // ⚠️ ATENÇÃO: COLOQUE A URL DA SUA IMPLANTAÇÃO DE EXECUÇÃO AQUI:
-   const APPS_SCRIPT_URL_WEBHOOK = 'https://script.google.com/macros/s/AKfycbx3DCWyocBs68G6PchVxq12uStL_XinHACUO89AZE8bjQRY7SJYl21Qhsg31hAh_n2J/exec'; 
-    // Ex: 'https://script.google.com/macros/s/AKfycbz7hDzUJdqRxgGAqe4YWkk-HCwd1rnzd34LdI72ET3i/exec'; 
+    // ⚠️ ATENÇÃO: COLOQUE A SUA NOVA URL DE IMPLANTAÇÃO AQUI:
+    const APPS_SCRIPT_URL_WEBHOOK = 'https://script.google.com/macros/s/AKfycbyjOd6xkhyxhyUzyCT1bbVntjI5BREOgMKNQ1mUcjms-L6aWMvS_bSHMCBWilyXvg/exec'; 
+    // Ex: 'https://script.google.com/macros/s/AKfycbz123ABCxyz/exec'; 
     // ====================================================================
 
     const reservas = {};
@@ -290,7 +288,7 @@
 
     cadeirasInput.addEventListener("input", atualizarTotal);
 
-    // --- LÓGICA DE SUBMISSÃO AGORA CHAMA O APPS SCRIPT ---
+    // --- LÓGICA DE SUBMISSÃO AGORA CHAMA O APPS SCRIPT COM NO-CORS ---
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const aluno = document.getElementById("aluno").value;
@@ -315,8 +313,10 @@
         }
 
         const valorTotal = mesasSelecionadas.length * 120 + cadeirasExtras * 10;
+        const reservaId = 'RSV-' + new Date().getTime().toString().slice(-6); // ID Gerado no Frontend
 
         const dadosReserva = {
+            reservaId, // Enviamos o ID
             aluno,
             turma,
             nome,
@@ -327,34 +327,24 @@
 
         try {
             // 1. ENVIA OS DADOS DA RESERVA PARA O SEU SERVIDOR GRATUITO (APPS SCRIPT)
-            const response = await fetch(APPS_SCRIPT_URL_WEBHOOK, {
+            await fetch(APPS_SCRIPT_URL_WEBHOOK, {
                 method: 'POST',
+                // *** CORREÇÃO ESSENCIAL: RESOLVE O 'Failed to fetch' ***
+                mode: 'no-cors', 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosReserva)
             });
             
-            // Verifica se a resposta HTTP é OK (código 200)
-            if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status} - ${await response.text()}`);
-            }
-
-            const resultado = await response.json();
-
-            if (resultado.status === 'success' && resultado.reservaId) {
-                const reservaId = resultado.reservaId; 
-                
-                // 2. INICIA O MONITORAMENTO DO SINAL
-                monitorarConfirmacao(reservaId, dadosReserva);
-                
-                // 3. MOSTRA O MODAL PIX (COM O ID PARA O CLIENTE)
-                mostrarModalPix(valorTotal, aluno, turma, nome, cadeirasExtras, mesasSelecionadas, reservaId); 
-            } else {
-                alert("Erro ao iniciar a reserva: " + resultado.message);
-            }
+            // 2. INICIA O MONITORAMENTO DO SINAL
+            // Assumimos que a requisição chegou ao Apps Script e iniciamos o monitoramento.
+            monitorarConfirmacao(reservaId, dadosReserva);
+            
+            // 3. MOSTRA O MODAL PIX (COM O ID PARA O CLIENTE)
+            mostrarModalPix(valorTotal, aluno, turma, nome, cadeirasExtras, mesasSelecionadas, reservaId); 
+            
         } catch (error) {
-            // Agora, se der erro, ele vai tentar mostrar a mensagem do Apps Script ou um erro de conexão
-            console.error("Erro na requisição ao Apps Script:", error);
-            alert(`Erro ao conectar com o servidor. Detalhes: ${error.message}`);
+            console.error("Erro FATAL na requisição ao Apps Script:", error);
+            alert(`Erro na requisição ao Apps Script. Verifique se o Netlify está com o NOVO URL de implantação do Apps Script.`);
         }
         
         selecionadas.clear();
@@ -387,7 +377,6 @@
                 gerarTicket(dadosReserva, reservaId); 
             }
         });
-        // Salva a função de desligamento para uso futuro se necessário (embora onValue retorne a função de off)
         confirmacaoRef.off = offFunction; 
     }
 
@@ -468,66 +457,6 @@
         aviso.innerHTML = "⏰ O sistema de reservas funciona entre <strong>07:00 e 15:30</strong>. Tente novamente nesse horário!";
         document.body.appendChild(aviso);
     }
-
-  // ... (Linhas anteriores do script)
-
-    // ====================================================================
-    // ⚠️ ATENÇÃO: COLOQUE A SUA NOVA URL DE IMPLANTAÇÃO AQUI:
-    const APPS_SCRIPT_URL_WEBHOOK = 'SEU_NOVO_URL_DE_EXECUÇÃO_AQUI'; 
-    // Ex: 'https://script.google.com/macros/s/AKfycbz123ABCxyz/exec'; 
-    // ====================================================================
-
-    const reservas = {};
-// ... (restante do script)
-    
-    // --- LÓGICA DE SUBMISSÃO AGORA CHAMA O APPS SCRIPT ---
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        // ... (Validações e preparação de dados)
-        
-        // Dados validados
-        const dadosReserva = { /* ... */ };
-
-        try {
-            // 1. ENVIA OS DADOS DA RESERVA PARA O SEU SERVIDOR GRATUITO (APPS SCRIPT)
-            const response = await fetch(APPS_SCRIPT_URL_WEBHOOK, {
-                method: 'POST',
-                // *** MUDANÇA ESSENCIAL: ADICIONANDO 'no-cors' ***
-                mode: 'no-cors', 
-                headers: { 
-                    'Content-Type': 'application/json' 
-                    // Note: 'no-cors' fará com que o navegador ignore o cabeçalho Content-Type, mas precisamos mantê-lo para o Apps Script
-                },
-                body: JSON.stringify(dadosReserva)
-            });
-            
-            // ATENÇÃO: Com 'no-cors', a propriedade 'response.ok' sempre será 'false' 
-            // e o 'response.status' sempre será '0'. 
-            // A ÚNICA MANEIRA DE SABER SE O APPS SCRIPT RECEBEU É VERIFICANDO OS LOGS DE EXECUÇÃO
-            // OU ASSUMINDO SUCESSO.
-
-            // 2. INICIA O MONITORAMENTO DO SINAL
-            // Assumimos que a requisição *chegou* ao Apps Script e iniciamos o monitoramento.
-            // Se o App Script falhar internamente (Ex: erro de Firebase), ele não vai escrever, 
-            // e o usuário ficará no modal aguardando. Isso é o comportamento esperado para 'no-cors'.
-            
-            const reservaId = 'RSV-' + new Date().getTime().toString().slice(-6); // Gera o ID no frontend
-            
-            monitorarConfirmacao(reservaId, dadosReserva);
-            mostrarModalPix(valorTotal, aluno, turma, nome, cadeirasExtras, mesasSelecionadas, reservaId); 
-            
-            // A PARTIR DAQUI, DEPENDEMOS DO APPS SCRIPT PARA GRAVAR O DADO
-
-        } catch (error) {
-            console.error("Erro FATAL na requisição ao Apps Script:", error);
-            alert(`Erro na requisição ao Apps Script. Verifique se o Netlify está com o NOVO URL de implantação do Apps Script.`);
-        }
-        
-        selecionadas.clear();
-        form.reset();
-        atualizarTotal();
-    });
-// ... (restante do script)
 
 </script>
 </body>
