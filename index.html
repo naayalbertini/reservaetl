@@ -469,11 +469,11 @@
 <body>
     <div class="header-content">
         <img src="img/tracos.png" alt="Escola Traços e Letras">
-         <img src="img/gaudi.png" alt="Colégio Antoni Gaudí">
         <div class="title-box">
             <h1>Festa da Família</h1>
             <span class="subtitle">Reserva de Mesas</span>
         </div>
+        <img src="img/gaudi.png" alt="Colégio Antoni Gaudí"> 
     </div>
 
 <div class="status-legend">
@@ -712,7 +712,7 @@
                 // === BLOCO: RESERVA ESPECIAL PARA A ESCOLA (Mesas 01, 02, 03, 04) ===
                 const mesasDaEscola = ['01', '02', '03', '04'];
                 if (mesasDaEscola.includes(numero)) {
-                    div.textContent = 'MESA DOS PROFESSORES'; 
+                    div.textContent = 'MESA DA ESCOLA'; 
                     div.classList.add("reservada"); 
                     div.style.cursor = 'not-allowed';
                     div.title = 'Reservada para a Escola';
