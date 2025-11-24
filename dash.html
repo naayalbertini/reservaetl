@@ -3,38 +3,183 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel de Gestão - Traços Culturais | Clean Edition</title>
+  <title>Painel de Gestão - Festa da Família</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   
   <style>
-    /* VARIÁVEIS DE COR PARA TEMA MINIMALISTA E CLARO */
+    /* VARIÁVEIS DE COR PARA TEMA GLASS/SOFISTICADO */
     :root {
       --bg-light: #f9f9f9;
       --bg-card: white;
       --text-dark: #333;
-      --accent-color: #007bff; /* Azul primário (clean) */
+      --accent-color: #007bff; /* Azul primário */
       --header-color: #f1f1f1;
       --border-color: #e0e0e0;
-      --reserved-color: #dc3545; /* Vermelho padrão */
-      --confirmed-color: #28a745; /* Verde padrão */
+      --reserved-color: #dc3545; /* Vermelho Padrão (Pendente) */
+      --confirmed-color: #28a745; /* Verde Padrão (Confirmado) */
+      
+      /* Novas variáveis para o design de login */
+      --glass-bg: rgba(255, 255, 255, 0.1); 
+      --login-card-bg: white;
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.1);
     }
+    
     body {
       font-family: 'Helvetica Neue', Arial, sans-serif;
-      background-color: var(--bg-light);
+      /* Fundo com gradiente suave e moderno */
+      background: linear-gradient(135deg, #eef1f5 0%, #dcdfe4 100%);
       color: var(--text-dark);
-      padding: 20px;
+      padding: 0; 
+      margin: 0;
       line-height: 1.6;
     }
+    
     .container {
       max-width: 1300px;
       margin: 0 auto;
       background: var(--bg-card);
       padding: 30px;
-      border-radius: 8px;
+      border-radius: 12px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     }
+    
+    /* ESTILOS ELEGANTES PARA A TELA DE LOGIN */
+    #login-screen {
+        display: none; 
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        /* Adiciona fundo suave para o login */
+        background: linear-gradient(135deg, #eef1f5 0%, #dcdfe4 100%); 
+    }
+    
+    .login-container {
+        /* Card de login branco puro com sombra sofisticada */
+        background: var(--login-card-bg); 
+        padding: 50px 40px; 
+        border-radius: 16px; 
+        box-shadow: var(--shadow-soft); 
+        width: 100%;
+        max-width: 360px; 
+        text-align: center;
+        border: 1px solid #f0f0f0; 
+    }
+
+    .login-container h1 {
+        color: var(--text-dark); 
+        margin-bottom: 35px; 
+        font-weight: 300; 
+        font-size: 2.5em; 
+        letter-spacing: 1px;
+        border-bottom: none;
+    }
+
+    #login-screen input[type="email"], #login-screen input[type="password"] {
+        width: 100%;
+        padding: 14px 12px; 
+        margin: 10px 0 20px 0;
+        border: 1px solid #ccc; 
+        border-radius: 8px; 
+        box-sizing: border-box;
+        font-size: 16px;
+        background-color: #f7f7f7; 
+        transition: all 0.3s;
+    }
+    #login-screen input:focus {
+        border-color: var(--accent-color); 
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15); 
+        outline: none;
+        background-color: white; 
+    }
+    
+    #login-screen button {
+        background-color: var(--accent-color);
+        color: white;
+        padding: 15px 20px;
+        margin: 15px 0 8px 0;
+        border: none;
+        border-radius: 8px; 
+        cursor: pointer;
+        width: 100%;
+        font-size: 17px;
+        font-weight: 500; 
+        letter-spacing: 0.5px;
+        transition: background-color 0.3s, box-shadow 0.2s;
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+    }
+
+    #login-screen button:hover {
+        background-color: #0056b3;
+        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+    }
+    
+    #error-message {
+        color: var(--reserved-color);
+        margin-top: 15px;
+        font-weight: 500;
+    }
+    /* FIM: ESTILOS ELEGANTES PARA LOGIN */
+
+    /* Estilos do Painel de Gestão */
+    #dashboard-content {
+        display: none; 
+        padding: 20px;
+    }
+    .user-info {
+        display: none; 
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 25px;
+        font-size: 1.1rem;
+    }
+    .user-info span {
+        display: flex;
+        align-items: center;
+        color: var(--text-dark);
+    }
+    
+    /* NOVO ESTILO PARA A IMAGEM DE PERFIL */
+    .profile-photo {
+        width: 35px; /* Tamanho da foto */
+        height: 35px;
+        border-radius: 50%; /* Torna a foto redonda */
+        margin-right: 10px;
+        object-fit: cover; /* Garante que a imagem preencha o espaço sem distorcer */
+        border: 2px solid var(--accent-color); /* Borda sutil */
+    }
+
+    /* O estilo profile-icon não é mais necessário, mas o mantemos para fallback ou estrutura */
+    .user-info .profile-icon {
+        font-size: 1.5rem;
+        margin-right: 10px;
+        color: var(--accent-color);
+    }
+    /* FIM NOVO ESTILO */
+
+    .logout-button {
+        background: none;
+        border: 1px solid var(--reserved-color);
+        color: var(--reserved-color);
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    .logout-button:hover {
+        background-color: var(--reserved-color);
+        color: white;
+    }
+    
     h1 {
       color: var(--text-dark);
       text-align: left;
@@ -45,7 +190,6 @@
       padding-bottom: 10px;
     }
     
-    /* BARRA DE AÇÕES (Busca e PDF) */
     .actions-bar {
         display: flex;
         justify-content: space-between;
@@ -97,6 +241,7 @@
     }
 
     /* ESTILOS DA TABELA */
+    
     #reservasTable {
       width: 100%;
       border-collapse: collapse;
@@ -120,6 +265,7 @@
       cursor: pointer;
       position: relative;
       letter-spacing: 0.5px;
+      white-space: nowrap; /* Evita quebra de linha nos cabeçalhos */
     }
     #reservasTable th:hover {
       background-color: #e9e9e9;
@@ -128,11 +274,27 @@
       background-color: #f5f5f5;
     }
     
-    /* Indicadores de Ordenação */
     .sort-asc::after { color: var(--accent-color); content: ' ▲'; font-size: 0.8em; }
     .sort-desc::after { color: var(--accent-color); content: ' ▼'; font-size: 0.8em; }
+    
+    /* ESTILO DO BOTÃO DE LEMBRETE PIX */
+    .pix-reminder-button { 
+        background-color: #f39c12; 
+        color: white;
+        margin-left: 5px; 
+        text-decoration: none; 
+        padding: 4px 8px; 
+        border-radius: 4px; 
+        font-weight: bold; 
+        font-size: 0.8rem; 
+        display: inline-block;
+        white-space: nowrap; /* Impede a quebra de linha */
+    }
+    .pix-reminder-button:hover {
+        background-color: #e67e22;
+    }
 
-    /* Estilos de Status e Ação */
+
     .status-badge {
         display: inline-block;
         padding: 5px 10px;
@@ -140,28 +302,62 @@
         font-weight: bold;
         font-size: 0.8rem;
     }
+    /* Status PENDENTE agora é VERMELHO */
     .status-pendente {
-        background-color: #ffe0b2; /* Laranja claro */
+        background-color: #f8d7da; 
         color: var(--reserved-color);
     }
+    /* Status CONFIRMADO agora é VERDE */
     .status-confirmado {
-        background-color: #c8e6c9; /* Verde claro */
+        background-color: #d4edda; 
         color: var(--confirmed-color);
     }
+    
+    /* NOVO ESTILO PARA CANCELAMENTO SOLICITADO */
+    .status-cancelamento {
+        background-color: #ffc107; /* Amarelo/Laranja de Alerta */
+        color: #333;
+        border: 1px solid #e0a800;
+    }
+    
+    /* ESTILO PARA ALINHAR BOTÕES NA COLUNA AÇÃO (Versão Desktop) */
+    #reservasTable td:nth-child(9) { 
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-start;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
 
-    .confirm-button {
-        background-color: var(--accent-color);
+
+    .action-button {
         color: white;
         border: none;
-        padding: 8px 15px;
+        padding: 8px 10px;
         border-radius: 4px;
         cursor: pointer;
         font-weight: 600;
         font-size: 0.85rem;
         transition: background-color 0.2s;
+        margin: 2px 0;
+        display: block; 
+        width: 100%;
+        text-align: center;
+        white-space: nowrap;
     }
-    .confirm-button:hover {
-        background-color: #0056b3;
+    .confirm-button {
+        background-color: var(--accent-color);
+    }
+    .edit-button {
+        background-color: #ffc107; 
+        color: #333;
+    }
+    .delete-button {
+        background-color: var(--reserved-color); 
+    }
+    .action-button:hover, .confirm-button:hover {
+        opacity: 0.9;
     }
 
     .total-reservas {
@@ -170,7 +366,7 @@
       text-align: center;
       font-size: 1.2rem;
       padding: 15px;
-      background-color: #e0f7fa; /* Azul claro suave */
+      background-color: #e0f7fa; 
       border-radius: 4px;
       color: #00796b;
       border: 1px solid #b2ebf2;
@@ -179,49 +375,266 @@
         color: #666;
         font-size: 1.1rem;
     }
+    
+    #editModal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-content-edit {
+        background-color: var(--bg-card);
+        padding: 25px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 450px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    .modal-content-edit label {
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+    .modal-content-edit input, .modal-content-edit select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .modal-content-edit h2 {
+        margin-top: 0;
+        color: var(--text-dark);
+    }
+    .close-button {
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #aaa;
+    }
+    .close-button:hover {
+        color: #333;
+    }
+
+    /* RESPONSIVIDADE (Novas Regras de Tabela em Card View) */
+    @media (max-width: 768px) {
+        body { padding: 0; }
+        .container {
+            padding: 15px;
+            border-radius: 0;
+            box-shadow: none;
+            min-height: 100vh;
+        }
+        h1 {
+            font-size: 1.8em;
+        }
+        .user-info {
+             flex-direction: column;
+             align-items: flex-start;
+             padding-bottom: 10px;
+        }
+        .logout-button {
+             margin-top: 10px;
+             font-size: 0.9rem;
+        }
+        .actions-bar {
+            flex-direction: column;
+            gap: 10px;
+        }
+        .search-area {
+            width: 100%;
+        }
+        .pdf-button {
+            width: 100%;
+        }
+        .total-reservas {
+            font-size: 1rem;
+            padding: 10px;
+        }
+        
+        /* 1. Oculta o cabeçalho original da tabela */
+        #reservasTable thead {
+            display: none;
+        }
+
+        /* 2. Transforma a linha da tabela (<tr>) em um bloco/card */
+        #reservasTable tr {
+            display: block;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            padding: 10px;
+            background-color: var(--bg-card);
+        }
+        
+        /* 3. Transforma a célula da tabela (<td>) em um bloco para empilhamento vertical */
+        #reservasTable td {
+            display: flex; /* Para alinhar o label com o valor */
+            justify-content: space-between;
+            text-align: right;
+            border: none; /* Remove a borda padrão */
+            padding: 8px 0; /* Padding vertical */
+            font-size: 0.95rem;
+        }
+        
+        /* 4. Injeta o cabeçalho (data-label) usando pseudo-elemento */
+        #reservasTable td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #555; /* Cor para o label */
+            padding-right: 10px;
+            text-align: left;
+            flex-shrink: 0; /* Impede que o label encolha */
+        }
+        
+        /* 5. Telefone: Ajuste a coluna de telefone para alinhar o número e o botão PIX */
+        #reservasTable td:nth-child(3) {
+            flex-direction: column; /* Telefone e botão PIX ficam um abaixo do outro */
+            align-items: flex-start;
+            text-align: left;
+        }
+        #reservasTable td:nth-child(3) .pix-reminder-button {
+            margin-left: 0;
+            text-align: center;
+            width: 100%;
+            margin-top: 5px;
+        }
+        
+        /* 6. Ação: Ajuste a coluna de ação para alinhar à esquerda e ocupar o espaço total */
+        #reservasTable td:nth-child(9) { 
+            flex-direction: column;
+            align-items: flex-start;
+            padding-top: 10px;
+            padding-bottom: 5px;
+            border-top: 1px dashed var(--border-color);
+            margin-top: 5px;
+            text-align: left; 
+        }
+        #reservasTable td:nth-child(9)::before {
+            display: none; /* Não exibe o label "Ação" */
+        }
+        .action-button {
+            font-size: 0.8rem;
+            padding: 8px 10px;
+            width: 100%;
+        }
+
+        /* Login screen compacta */
+        .login-container {
+            padding: 30px 25px;
+        }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Gestão de Reservas</h1>
-    
-    <div class="actions-bar">
-        <div class="search-area">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="search-input" placeholder="Buscar por Aluno, Turma, Mesa..." onkeyup="filtrarTabela()">
+  
+    <div id="login-screen">
+        <div class="login-container">
+            <h1>Acesso ao Painel</h1>
+            <input type="email" id="email" placeholder="E-mail" required>
+            <input type="password" id="password" placeholder="Senha" required>
+            <button onclick="login()">Entrar</button>
+            <div id="error-message"></div>
         </div>
-        <button class="pdf-button" onclick="exportarPDF()">⬇️ Baixar Relatório (PDF)</button>
+    </div>
+    <div id="dashboard-content">
+        <div class="container">
+            
+            <div id="user-info" class="user-info">
+                <span>
+                    <img id="profile-img" class="profile-photo" src="" alt="Foto de Perfil">
+                    Olá, <span id="saudacao-nome">Carregando...</span>
+                </span>
+                <button class="logout-button" onclick="fazerLogout()">Sair</button>
+            </div>
+            <h1>Gestão de Reservas</h1>
+            
+            <div class="actions-bar">
+                <div class="search-area">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="search-input" placeholder="Buscar por Aluno, Turma, Mesa..." onkeyup="filtrarTabela()">
+                </div>
+                <button class="pdf-button" onclick="exportarPDF()">⬇️ Baixar Relatório (PDF)</button>
+            </div>
+
+            <div class="total-reservas">Total de Mesas no Painel: <span id="totalReservas">0</span></div>
+            
+            <div id="loading" class="loading-text" style="text-align: center;">Carregando dados...</div>
+            
+            <table id="reservasTable">
+                <thead>
+                    <tr>
+                    <th data-column-index="0" class="sortable">Mesa(s)</th>
+                    <th data-column-index="1" class="sortable">Responsável</th>
+                    <th data-column-index="2" class="sortable">Telefone</th> 
+                    <th data-column-index="3" class="sortable">Aluno / Turma</th>
+                    <th data-column-index="4" class="sortable">Valor (R$)</th>
+                    <th data-column-index="5" class="sortable">Pagamento</th> 
+                    <th data-column-index="6" class="sortable sort-desc">Data/Hora</th> 
+                    <th>Status</th>
+                    <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+                </table>
+            </div>
+    </div>
+    <div id="editModal">
+        <div class="modal-content-edit">
+            <span class="close-button" onclick="fecharModalEdicao()">&times;</span>
+            <h2>Editar Reserva</h2>
+            <p>Editando reserva principal da(s) mesa(s): <strong id="editMesas"></strong></p>
+            
+            <input type="hidden" id="editMesaPrincipalId">
+
+            <label for="editNome">Responsável:</label>
+            <input type="text" id="editNome">
+
+            <label for="editTelefone">WhatsApp (Apenas números):</label>
+            <input type="tel" id="editTelefone" pattern="[0-9]{11}">
+            
+            <label for="editAluno">Aluno:</label>
+            <input type="text" id="editAluno">
+            
+            <label for="editTurma">Turma:</label>
+            <input type="text" id="editTurma">
+            
+            <label for="editFormaPagamento">Forma de Pagamento:</label>
+            <select id="editFormaPagamento" onchange="toggleOutrosField()">
+                <option value="Pix">Pix</option>
+                <option value="Cartao Credito">Cartão de Crédito</option>
+                <option value="Cartao Debito">Cartão de Débito</option>
+                <option value="Dinheiro">Dinheiro</option>
+                <option value="Outros">Outros...</option>
+            </select>
+            <input type="text" id="editOutrosDetalhe" placeholder="Especifique o tipo de pagamento" style="display: none; margin-top: -10px;">
+            <button class="action-button confirm-button" onclick="salvarEdicao()">Salvar Alterações</button>
+            <button class="action-button delete-button" onclick="fecharModalEdicao()" style="background-color: #6c757d;">Cancelar</button>
+        </div>
     </div>
 
-    <div class="total-reservas">Total de Mesas no Painel: <span id="totalReservas">0</span></div>
-    
-    <div id="loading" class="loading-text" style="text-align: center;">Carregando dados...</div>
-    
-    <table id="reservasTable">
-      <thead>
-        <tr>
-          <th data-column-index="0" class="sortable">Mesa(s)</th>
-          <th data-column-index="1" class="sortable">Responsável</th>
-          <th data-column-index="2" class="sortable">Aluno / Turma</th>
-          <th data-column-index="3" class="sortable">Valor (R$)</th>
-          <th data-column-index="4" class="sortable sort-desc">Data/Hora</th>
-          <th>Status</th>
-          <th>Ação</th>
-        </tr>
-      </thead>
-      <tbody>
-        </tbody>
-    </table>
-  </div>
-
-  <script type="module">
-    // *** CÓDIGO JAVASCRIPT CORRIGIDO ***
+<script type="module">
+    // *** CÓDIGO JAVASCRIPT UNIFICADO ***
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"; 
 
     // Sua Configuração Exata do Firebase
-const firebaseConfig = {
+    const firebaseConfig = {
       apiKey: "AIzaSyCmuuPAX68dOcESWMFdynI56j_GYkosEmg",
       authDomain: "reservas-tracos-culturais.firebaseapp.com",
       databaseURL: "https://reservas-tracos-culturais-default-rtdb.firebaseio.com",
@@ -233,37 +646,214 @@ const firebaseConfig = {
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-
+    const auth = getAuth(app); 
+    
+    // Elementos DOM
+    const dashboardContent = document.getElementById('dashboard-content');
+    const loginScreen = document.getElementById('login-screen');
+    const errorMessageDiv = document.getElementById('error-message');
     const tbody = document.querySelector('#reservasTable tbody');
     const loadingDiv = document.getElementById('loading');
     const totalReservasSpan = document.getElementById('totalReservas');
     const searchInput = document.getElementById('search-input');
     const headers = document.querySelectorAll('#reservasTable th.sortable');
+    const formaPagamentoSelect = document.getElementById('editFormaPagamento');
+    const outrosDetalheInput = document.getElementById('editOutrosDetalhe');
+    const userInfoDiv = document.getElementById('user-info');
+    const saudacaoSpan = document.getElementById('saudacao-nome');
+    const profileImg = document.getElementById('profile-img');
     
     let dadosAgrupados = [];
-    let sortColumn = 4; // Novo índice padrão: Data/Hora
+    let sortColumn = 6; 
     let sortDirection = 'desc';
+    
+    const FIXED_PAYMENT_OPTIONS = ['Pix', 'Cartao Credito', 'Cartao Debito', 'Dinheiro'];
+    
+    // Array de labels (usado no mobile view)
+    const tableLabels = [
+        'MESA(S)', 'RESPONSÁVEL', 'TELEFONE', 'ALUNO / TURMA', 
+        'VALOR (R$)', 'PAGAMENTO', 'DATA/HORA', 'STATUS', 'AÇÃO'
+    ];
 
-    // ----------------------------------------------------
-    // FUNÇÕES DE FILTRAGEM E ORDENAÇÃO (CORRIGIDAS)
-    // ----------------------------------------------------
 
-    window.filtrarTabela = function() {
-      const termo = searchInput.value.toLowerCase();
-      const linhas = tbody.querySelectorAll('tr');
+    // ====================================================
+    // 1. LÓGICA DE AUTENTICAÇÃO (CONTROLE DE TELAS)
+    // ====================================================
+    
+    // Mostra a tela de login primeiro
+    loginScreen.style.display = 'flex';
+    dashboardContent.style.display = 'none';
 
-      let mesasVisiveis = 0;
-      linhas.forEach(row => {
-        const textoLinha = row.textContent.toLowerCase();
-        const isVisible = textoLinha.includes(termo);
-        row.style.display = isVisible ? '' : 'none';
-        
-        if(isVisible) {
-            const mesasText = row.querySelector('td:first-child').textContent;
-            mesasVisiveis += mesasText.split(',').length;
+    // 🚨🚨🚨 BLOCO DE CONFIGURAÇÃO DE NOME E FOTO 🚨🚨🚨
+    // Mapeamento de E-mail para Nome de Exibição
+    const userDisplayNames = {
+        "SEU.EMAIL.AQUI@escola.com.br": "SEU NOME COMPLETO AQUI", 
+        "financeiro@escola.com.br": "Financeiro",   
+        "admin@escola.com.br": "Administrador"       
+    };
+    
+    // Mapeamento de E-mail para URL da Foto (Use URLs públicas, como do Imgur, Google Drive, ou seu próprio servidor)
+    const userProfilePhotos = {
+        "SEU.EMAIL.AQUI@escola.com.br": "URL_DA_SUA_FOTO_AQUI.jpg", // Exemplo: "https://i.imgur.com/SuaFoto.jpg"
+        "financeiro@escola.com.br": "https://i.imgur.com/FinanceiroDefault.png", 
+        "admin@escola.com.br": "https://i.imgur.com/AdminDefault.png"       
+    };
+    // 🚨🚨🚨 FIM DO BLOCO DE CONFIGURAÇÃO 🚨🚨🚨
+    
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Usuário logado: Esconde login, mostra dashboard
+            loginScreen.style.display = 'none';
+            dashboardContent.style.display = 'block'; 
+            
+            // --- Lógica de Personalização ---
+            const email = user.email;
+            
+            // 1. Nome de Exibição
+            let nomeDisplay = userDisplayNames[email] || email.split('@')[0];
+            if (nomeDisplay === email.split('@')[0]) {
+                 nomeDisplay = nomeDisplay.replace('.', ' ');
+                 nomeDisplay = nomeDisplay.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            }
+            saudacaoSpan.textContent = nomeDisplay;
+            
+            // 2. Foto de Perfil
+            const fotoUrl = userProfilePhotos[email] || 'https://i.imgur.com/p9vF6qj.png'; // Fallback para ícone genérico se não mapeado
+            profileImg.src = fotoUrl;
+            
+            userInfoDiv.style.display = 'flex'; 
+            
+            // Inicia o carregamento dos dados
+            iniciarCarregamentoDeDados(); 
+            
+        } else {
+            // Usuário não logado: Mostra login, esconde dashboard
+            dashboardContent.style.display = 'none';
+            loginScreen.style.display = 'flex';
+            loadingDiv.textContent = 'Carregando dados...';
         }
-      });
-      totalReservasSpan.textContent = mesasVisiveis.toString();
+    });
+
+    // Função de Login 
+    window.login = async function() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        errorMessageDiv.textContent = ''; 
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            // O onAuthStateChanged será acionado e mostrará o dashboard.
+        } catch (error) {
+            console.error("Erro de Login:", error);
+            
+            let message = "❌ Erro desconhecido. Tente novamente.";
+
+            switch (error.code) {
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                    message = "❌ E-mail ou senha incorretos. Verifique suas credenciais.";
+                    break;
+                case 'auth/invalid-email':
+                    message = "❌ O formato do e-mail é inválido.";
+                    break;
+                default:
+                    message = "❌ Erro ao tentar conectar. Verifique o console para detalhes.";
+            }
+
+            errorMessageDiv.textContent = message;
+        }
+    }
+
+    // Função de Logout
+    window.fazerLogout = async function() {
+        if(confirm("Tem certeza que deseja sair do Painel de Gestão?")) {
+            try {
+                await signOut(auth);
+                // O onAuthStateChanged fará a transição para a tela de login.
+            } catch (error) {
+                alert("❌ Erro ao fazer logout: " + error.message);
+                console.error("Erro de Logout:", error);
+            }
+        }
+    }
+
+    // ====================================================
+    // 2. FUNÇÕES DO DASHBOARD
+    // ====================================================
+    
+    function iniciarCarregamentoDeDados() {
+        onValue(ref(db, "reservas"), (snapshot) => {
+            loadingDiv.style.display = 'none';
+            dadosAgrupados = [];
+
+            const reservasData = snapshot.val();
+            if (!reservasData) {
+                renderizarTabela([]);
+                return;
+            }
+
+            const reservasMap = new Map();
+
+            for (const mesaId in reservasData) {
+                const reserva = reservasData[mesaId];
+                if (!reserva.status) reserva.status = 'pendente'; 
+                
+                const formaPagamento = reserva.formaPagamento || 'Pix';
+                const telefone = reserva.telefone || 'semtel'; // Telefone é importante para o Agrupamento e WhatsApp
+
+                // 🚨 CORREÇÃO PRINCIPAL: Adiciona mesasSelecionadas (array das mesas no pedido) na chave 🚨
+                const mesasLista = reserva.mesasSelecionadas ? reserva.mesasSelecionadas.sort().join('|') : 'semmesas';
+                const chaveReserva = `${reserva.aluno}-${reserva.nome}-${reserva.data}-${reserva.horario}-${reserva.valorTotal}-${telefone}-${formaPagamento}-${mesasLista}`;
+                // 🚨 FIM DA CORREÇÃO PRINCIPAL 🚨
+                
+                if (!reservasMap.has(chaveReserva)) {
+                    reservasMap.set(chaveReserva, {
+                        ...reserva,
+                        formaPagamento: formaPagamento, 
+                        telefone: telefone === 'semtel' ? null : telefone,
+                        mesas: [mesaId]
+                    });
+                } else {
+                    reservasMap.get(chaveReserva).mesas.push(mesaId);
+                }
+            }
+            
+            dadosAgrupados = Array.from(reservasMap.values());
+            ordenarTabela(sortColumn, sortDirection);
+
+        }, (error) => {
+            loadingDiv.textContent = `❌ ERRO FATAL ao buscar dados: ${error.message}.`;
+            console.error("Firebase Error:", error);
+        });
+    }
+
+    window.toggleOutrosField = function() {
+        if (formaPagamentoSelect.value === 'Outros') {
+            outrosDetalheInput.style.display = 'block';
+            outrosDetalheInput.focus();
+        } else {
+            outrosDetalheInput.style.display = 'none';
+        }
+    }
+    
+    window.filtrarTabela = function() {
+        const termo = searchInput.value.toLowerCase();
+        const linhas = tbody.querySelectorAll('tr');
+
+        let mesasVisiveis = 0;
+        linhas.forEach(row => {
+            const textoLinha = row.textContent.toLowerCase();
+            const isVisible = textoLinha.includes(termo);
+            row.style.display = isVisible ? '' : 'none';
+            
+            if(isVisible) {
+                const mesasText = row.querySelector('td:first-child').textContent;
+                // Conta o número de mesas neste grupo visível
+                const count = mesasText.split(',').filter(m => m.trim().length > 0).length;
+                mesasVisiveis += count;
+            }
+        });
+        totalReservasSpan.textContent = mesasVisiveis.toString();
     }
 
     function ordenarTabela(index, direction) {
@@ -276,20 +866,22 @@ const firebaseConfig = {
         dadosAgrupados.sort((a, b) => {
             let aVal, bVal;
             
-            // ÍNDICES DO SWITCH ATUALIZADOS
             switch (index) {
-                case 0: aVal = parseInt(a.mesas[0]); bVal = parseInt(b.mesas[0]); break; // Mesa
-                case 1: aVal = a.nome; bVal = b.nome; break; // Responsável
-                case 2: aVal = a.aluno; bVal = b.aluno; break; // Aluno/Turma
-                case 3: aVal = a.valorTotal; bVal = b.valorTotal; break; // Valor
-                case 4: // Data/Hora
+                case 0: aVal = parseInt(a.mesas[0]); bVal = parseInt(b.mesas[0]); break; 
+                case 1: aVal = a.nome; bVal = b.nome; break; 
+                case 2: aVal = a.telefone || ''; bVal = b.telefone || ''; break; // Telefone
+                case 3: aVal = a.aluno; bVal = b.aluno; break; 
+                case 4: aVal = a.valorTotal; bVal = b.valorTotal; break; 
+                case 5: aVal = a.formaPagamento || 'Pix'; bVal = b.formaPagamento || 'Pix'; break; 
+                case 6: 
                 default:
+                    // Ordenação por Data/Hora (coluna 6)
                     const aDate = new Date(`${a.data.split('/').reverse().join('-')}T${a.horario}:00`);
                     const bDate = new Date(`${b.data.split('/').reverse().join('-')}T${b.horario}:00`);
                     return direction === 'asc' ? aDate - bDate : bDate - aDate;
             }
 
-            if (index === 4) return 0; // Data/Hora já ordenada
+            if (index === 6) return 0; // Se for data, já foi ordenada acima.
 
             if (typeof aVal === 'number') {
                 return direction === 'asc' ? aVal - bVal : bVal - aVal;
@@ -301,59 +893,373 @@ const firebaseConfig = {
         renderizarTabela(dadosAgrupados);
     }
     
+    // Função para gerar a mensagem de Lembrete PIX (Sem emojis problemáticos)
+    function getMensagemLembretePix(reserva) {
+        const PIX_CHAVE = "45.701.401/0001-07";
+        const mesasTexto = reserva.mesas.sort((a, b) => parseInt(a) - parseInt(b)).join(', ');
+        const valorTexto = `R$ ${reserva.valorTotal.toFixed(2).replace('.', ',')}`;
+
+        const mensagem = `
+*LEMBRETE DE RESERVA - FESTA DA FAMÍLIA*
+
+Olá, ${reserva.nome}!
+
+Identificamos a sua reserva das *Mesas ${mesasTexto}* no valor de *${valorTexto}* para o nosso evento.
+
+O prazo para a confirmação via PIX é de *48 horas*. Se você ainda não pagou, segue a chave PIX novamente:
+
+*CHAVE PIX CNPJ:* ${PIX_CHAVE}
+*Nome:* Colégio Antoni Gaudi
+
+*Lembrete:* Sua reserva será liberada se o pagamento não for confirmado a tempo.
+
+Agradecemos e aguardamos a sua confirmação!
+        `.trim();
+        return mensagem;
+    }
+
+    // 🚨 FUNÇÃO MODIFICADA PARA ADICIONAR data-label E NOVO STATUS 🚨
     function renderizarTabela(reservas) {
         tbody.innerHTML = '';
         let totalMesas = 0; 
         
+        // Array de labels
+        const labels = tableLabels; // Usa a constante definida acima
+
         reservas.forEach(reserva => {
             const row = tbody.insertRow();
             
             const numMesas = reserva.mesas.length;
             totalMesas += numMesas;
 
-            row.insertCell().textContent = reserva.mesas.sort((a, b) => parseInt(a) - parseInt(b)).join(', '); // 0. Mesas
-            row.insertCell().textContent = reserva.nome; // 1. Responsável
-            row.insertCell().textContent = `${reserva.aluno} (${reserva.turma})`; // 2. Aluno/Turma
-            // CADEIRAS EXTRAS REMOVIDO
-            row.insertCell().textContent = `R$ ${reserva.valorTotal.toFixed(2).replace('.', ',')}`; // 3. Valor
-            row.insertCell().textContent = `${reserva.data} ${reserva.horario}`; // 4. Data/Hora
+            // 0. Mesa(s)
+            const mesasCell = row.insertCell();
+            mesasCell.textContent = reserva.mesas.sort((a, b) => parseInt(a) - parseInt(b)).join(', '); 
+            mesasCell.setAttribute('data-label', labels[0]);
+
+            // 1. Responsável
+            const responsavelCell = row.insertCell();
+            responsavelCell.textContent = reserva.nome; 
+            responsavelCell.setAttribute('data-label', labels[1]);
+
+            // 2. Telefone
+            const telCell = row.insertCell(); 
+            telCell.setAttribute('data-label', labels[2]);
+            const telefoneFormatado = reserva.telefone ? reserva.telefone.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3') : 'N/A';
             
-            // Coluna STATUS
+            // Reintrodução do link de Lembrete PIX e formatação do telefone
+            telCell.innerHTML = `
+              ${telefoneFormatado} 
+              ${reserva.telefone ? `<a href="https://wa.me/55${reserva.telefone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(getMensagemLembretePix(reserva))}" target="_blank" class="pix-reminder-button">
+                Lembrete PIX
+              </a>` : ''}
+            `;
+            
+            // 3. Aluno / Turma
+            const alunoTurmaCell = row.insertCell();
+            alunoTurmaCell.textContent = `${reserva.aluno} (${reserva.turma})`; 
+            alunoTurmaCell.setAttribute('data-label', labels[3]);
+
+            // 4. Valor (R$)
+            const valorCell = row.insertCell();
+            valorCell.textContent = `R$ ${reserva.valorTotal.toFixed(2).replace('.', ',')}`; 
+            valorCell.setAttribute('data-label', labels[4]);
+
+            // 5. Pagamento
+            const pagamentoCell = row.insertCell();
+            const formaPagamento = reserva.formaPagamento || 'Pix';
+            pagamentoCell.textContent = formaPagamento; 
+            pagamentoCell.setAttribute('data-label', labels[5]);
+            
+            // 6. Data/Hora
+            const dataHoraCell = row.insertCell();
+            dataHoraCell.textContent = `${reserva.data} ${reserva.horario}`; 
+            dataHoraCell.setAttribute('data-label', labels[6]);
+            
+            // 7. Status
             const statusCell = row.insertCell();
+            statusCell.setAttribute('data-label', labels[7]);
             const status = reserva.status || 'pendente';
-            const statusClass = status === 'confirmado' ? 'status-confirmado' : 'status-pendente';
-            const statusText = status === 'confirmado' ? 'CONFIRMADO' : 'PENDENTE (PIX)';
+            
+            // NOVO BLOCO: Lógica para determinar a classe e o texto do status
+            let statusClass = 'status-pendente'; // Padrão: Pendente
+            let statusText = 'PENDENTE (PIX)';   // Padrão: Pendente
+
+            if (status === 'paga') {
+                statusClass = 'status-confirmado';
+                statusText = 'PAGA (CONFIRMADO)';
+            } else if (status === 'cancelamento-solicitado') {
+                // AGORA TRATA O STATUS DE CANCELAMENTO
+                statusClass = 'status-cancelamento';
+                statusText = 'CANCELAMENTO SOLICITADO';
+            }
+
             statusCell.innerHTML = `<span class="status-badge ${statusClass}">${statusText}</span>`;
 
-            // Coluna AÇÃO
+            // 8. Ação
             const actionCell = row.insertCell();
-            if (status === 'pendente') {
-                const mesaPrincipal = reserva.mesas[0];
-                actionCell.innerHTML = `<button class="confirm-button" onclick="confirmarPagamento('${mesaPrincipal}')">CONFIRMAR</button>`;
-            } else {
-                actionCell.textContent = '—';
+            actionCell.setAttribute('data-label', labels[8]); 
+            const mesaPrincipal = reserva.mesas[0];
+            
+            let actionHTML = '';
+            
+            // 1. CANCELAR / ESTORNAR
+            actionHTML += `<button class="action-button delete-button" onclick="cancelarReserva('${mesaPrincipal}')">❌ Cancelar / Estornar</button>`;
+            
+            // 2. EDITAR
+            actionHTML += `<button class="action-button edit-button" onclick="abrirModalEdicao('${mesaPrincipal}')">✏️ Editar</button>`;
+
+            // 3. CONFIRMAR PAGAMENTO
+            if (status === 'pendente' || status === 'cancelamento-solicitado') { // Permite confirmar mesmo se foi solicitado cancelamento
+                actionHTML += `<button class="action-button confirm-button" onclick="confirmarPagamento('${mesaPrincipal}')">✅ Confirmar</button>`;
+            } 
+            
+            // 4. MENSAGEM DE CONFIRMAÇÃO FINAL
+            if (status === 'paga') {
+                actionHTML += `<button class="action-button" style="background-color: #8e44ad; margin-top: 5px;" onclick="enviarConfirmacaoFinal('${mesaPrincipal}')">✉️ Confirmação Final</button>`; 
             }
+            
+            actionCell.innerHTML = actionHTML;
         });
         
         totalReservasSpan.textContent = totalMesas.toString();
+        // Filtra para garantir que apenas os resultados do filtro/busca (se houver) sejam mostrados
         filtrarTabela(); 
     }
 
-    headers.forEach((header, index) => {
-        header.addEventListener('click', () => {
-            if (sortColumn === index) {
-                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortColumn = index;
-                sortDirection = 'desc';
+    // ====================================================
+    // 3. FUNÇÕES DE AÇÃO (CONFIRMAR, EDITAR, CANCELAR)
+    // ====================================================
+
+    window.confirmarPagamento = async function(mesaPrincipalId) {
+        const confirmacao = confirm(`Tem certeza que deseja CONFIRMAR o pagamento para a reserva da MESA ${mesaPrincipalId}?`);
+        
+        if (confirmacao) {
+            try {
+                const reservaParaConfirmar = dadosAgrupados.find(r => r.mesas[0] === mesaPrincipalId);
+                
+                if (!reservaParaConfirmar) {
+                    alert('❌ Erro: Reserva não encontrada localmente.');
+                    return;
+                }
+
+                const mesasIds = reservaParaConfirmar.mesas;
+                const updates = {};
+                
+                mesasIds.forEach(mesaId => {
+                    updates[`/reservas/${mesaId}/status`] = 'paga';
+                });
+
+                await update(ref(db), updates); 
+                
+                alert(`✅ Pagamento CONFIRMADO para as mesas: ${mesasIds.join(', ')}.`);
+
+            } catch (error) {
+                alert(`❌ Erro ao confirmar pagamento: ${error.message}`);
+                console.error("Erro no Firebase:", error);
             }
-            ordenarTabela(sortColumn, sortDirection);
-        });
-    });
+        }
+    }
+
+
+    // FUNÇÃO: CANCELAR E ESTORNAR 
+    window.cancelarReserva = async function(mesaPrincipalId) {
+        // 1. Encontra a reserva para coletar os dados
+        const reservaParaCancelar = dadosAgrupados.find(r => r.mesas[0] === mesaPrincipalId);
+        
+        if (!reservaParaCancelar) {
+            alert('❌ Erro: Reserva não encontrada localmente.');
+            return;
+        }
+        
+        const mesasIds = reservaParaCancelar.mesas;
+        const mesasTexto = mesasIds.join(', ');
+
+        // 2. Confirmação
+        const confirmacao = confirm(
+            `Tem certeza que deseja CANCELAR a reserva das mesas ${mesasTexto}? \n\n` +
+            `⚠️ Esta ação irá DELETAR a reserva do sistema e DEVE ser usada para processar o ESTORNO/DEVOLUÇÃO do valor.`
+        );
+        
+        if (confirmacao) {
+            try {
+                const updates = {};
+                
+                // Marca as mesas para exclusão (define como 'null')
+                mesasIds.forEach(mesaId => {
+                    updates[`/reservas/${mesaId}`] = null;
+                });
+
+                // Executa a exclusão atômica no Firebase
+                await update(ref(db), updates); 
+                
+                alert(`❌ Reservas das mesas ${mesasTexto} CANCELADAS e liberadas com sucesso! Fazer ESTORNO.`);
+
+                // 3. Notificação (Ação para o ADM)
+                enviarNotificacaoCancelamento(reservaParaCancelar);
+
+            } catch (error) {
+                alert(`❌ Erro ao cancelar reserva: ${error.message}`);
+                console.error("Erro no Firebase:", error);
+            }
+        }
+    }
+
+    // Função para enviar o WhatsApp de Estorno (mantida da versão anterior)
+    function enviarNotificacaoCancelamento(reserva) {
+        const mesas = reserva.mesas.join(', ');
+        const valor = reserva.valorTotal.toFixed(2).replace('.', ',');
+        const status = reserva.status === 'paga' ? 'PAGA' : 'PENDENTE'; 
+        const telefone = reserva.telefone || 'N/A';
+
+        const mensagem = `
+*CANCELAMENTO DE RESERVA/ESTORNO* 🚫
+---
+*AÇÃO NECESSÁRIA: ESTORNO!*
+---
+*Responsável:* ${reserva.nome}
+*Telefone:* ${telefone}
+*Aluno/Turma:* ${reserva.aluno} (${reserva.turma})
+*Mesas:* ${mesas}
+*Valor a Estornar:* R$ ${valor}
+*Status Original:* ${status}
+
+*ATENÇÃO:* Esta reserva foi deletada do sistema e o estorno deve ser processado.
+        `.trim().replace(/\n/g, '%0A');
+
+        const numeroFinanceiro = '5571999183320'; 
+
+        window.open(`https://wa.me/${numeroFinanceiro}?text=${mensagem}`, '_blank');
+    }
     
-    // ----------------------------------------------------
-    // FUNÇÃO DE EXPORTAÇÃO PARA PDF (CORRIGIDA)
-    // ----------------------------------------------------
+    // FUNÇÃO: Enviar Confirmação Final ao Cliente
+    window.enviarConfirmacaoFinal = function(mesaPrincipalId) {
+        const reserva = dadosAgrupados.find(r => r.mesas[0] === mesaPrincipalId);
+        
+        if (!reserva || reserva.status !== 'paga') { 
+            alert("❌ Erro: Apenas reservas PAGAS (Status 'Paga') podem receber o envio final.");
+            return;
+        }
+        
+        // VALORES FIXOS (Ajuste se necessário)
+        const localEvento = "Auditório Principal - Colégio Antoni Gaudi";
+        const dataEvento = "15 de Dezembro, 19:00h";
+        
+        const mesasTexto = reserva.mesas.join(', ');
+
+        const mensagemFinal = `
+*PRESENÇA CONFIRMADA!* *FESTA DA FAMÍLIA*
+
+Olá, ${reserva.nome}!
+
+Obrigado por confirmar sua reserva. Sua presença e a de seus convidados estão garantidas!
+
+*Detalhes da Sua Reserva:*
+*Responsável:* ${reserva.nome}
+*Aluno:* ${reserva.aluno} (${reserva.turma})
+*Mesa(s) Reservada(s):* ${mesasTexto}
+*Status:* PAGAMENTO CONFIRMADO
+
+*Detalhes do Evento:*
+*Local:* ${localEvento}
+*Data/Hora:* ${dataEvento}
+
+Esperamos por vocês! Pedimos a gentileza de chegar com 15 minutos de antecedência.
+        `.trim().replace(/\n/g, '%0A');
+
+        let telefoneDestino = reserva.telefone;
+
+        if (!telefoneDestino) {
+            // Se o telefone não estiver nos dados, pede ao administrador
+            const inputTel = prompt("O telefone não foi encontrado. Por favor, digite o número do WhatsApp do responsável (apenas números, com DDD):");
+            if (inputTel && inputTel.match(/^[0-9]+$/)) {
+                 telefoneDestino = inputTel.replace(/[^0-9]/g, '');
+            } else {
+                alert("❌ Número de telefone inválido ou cancelado.");
+                return;
+            }
+        }
+        
+        // Envia APENAS a mensagem de texto
+        window.open(`https://wa.me/55${telefoneDestino}?text=${mensagemFinal}`, '_blank');
+    };
+
+
+    // FUNÇÕES DO MODAL DE EDIÇÃO 
+    window.abrirModalEdicao = function(mesaPrincipalId) {
+        const reserva = dadosAgrupados.find(r => r.mesas[0] === mesaPrincipalId);
+        
+        if (!reserva) {
+            alert('❌ Reserva não encontrada para edição.');
+            return;
+        }
+
+        document.getElementById('editMesaPrincipalId').value = mesaPrincipalId;
+        document.getElementById('editMesas').textContent = reserva.mesas.sort((a, b) => parseInt(a) - parseInt(b)).join(', ');
+        
+        document.getElementById('editNome').value = reserva.nome || '';
+        document.getElementById('editTelefone').value = reserva.telefone || '';
+        document.getElementById('editAluno').value = reserva.aluno || '';
+        document.getElementById('editTurma').value = reserva.turma || '';
+        
+        const formaPagamentoSalva = reserva.formaPagamento || 'Pix';
+
+        if (FIXED_PAYMENT_OPTIONS.includes(formaPagamentoSalva)) {
+            formaPagamentoSelect.value = formaPagamentoSalva;
+            outrosDetalheInput.value = '';
+        } else {
+            formaPagamentoSelect.value = 'Outros';
+            outrosDetalheInput.value = formaPagamentoSalva;
+        }
+        
+        toggleOutrosField(); 
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    window.fecharModalEdicao = function() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    window.salvarEdicao = async function() {
+        const mesaPrincipalId = document.getElementById('editMesaPrincipalId').value;
+        const novoNome = document.getElementById('editNome').value;
+        const novoTelefone = document.getElementById('editTelefone').value.replace(/[^0-9]/g, ''); // Garante que só há números
+        const novoAluno = document.getElementById('editAluno').value;
+        const novaTurma = document.getElementById('editTurma').value;
+        
+        let novaFormaPagamento = formaPagamentoSelect.value;
+        
+        if (novaFormaPagamento === 'Outros') {
+            novaFormaPagamento = outrosDetalheInput.value || 'Outros (não especificado)';
+        }
+
+        const reservaOriginal = dadosAgrupados.find(r => r.mesas[0] === mesaPrincipalId);
+        if (!reservaOriginal) return alert('❌ Erro interno: Reserva não encontrada.');
+
+        const mesasIds = reservaOriginal.mesas;
+        const updates = {};
+        
+        mesasIds.forEach(mesaId => {
+            updates[`/reservas/${mesaId}/nome`] = novoNome;
+            updates[`/reservas/${mesaId}/telefone`] = novoTelefone;
+            updates[`/reservas/${mesaId}/aluno`] = novoAluno;
+            updates[`/reservas/${mesaId}/turma`] = novaTurma;
+            updates[`/reservas/${mesaId}/formaPagamento`] = novaFormaPagamento;
+        });
+
+        try {
+            await update(ref(db), updates);
+            alert(`✅ Reserva das mesas ${mesasIds.join(', ')} editada com sucesso!`);
+            fecharModalEdicao();
+        } catch (error) {
+            alert(`❌ Erro ao salvar edição: ${error.message}`);
+            console.error("Erro no Firebase:", error);
+        }
+    }
+    
+    // ====================================================
+    // 4. FUNÇÃO DE EXPORTAÇÃO (PDF)
+    // ====================================================
 
     window.exportarPDF = function() {
         const { jsPDF } = window.jspdf;
@@ -369,18 +1275,24 @@ const firebaseConfig = {
         }
 
         const cabecalhos = Array.from(tabela.querySelectorAll('thead th')).map(th => th.textContent.trim());
-        cabecalhos.pop(); // Remove a coluna Ação
-        cabecalhos.pop(); // Remove a coluna Status 
+        cabecalhos.pop(); // Remove Ação
+        cabecalhos.pop(); // Remove Status
 
         const dados = linhasVisiveis.map(row => {
             const cells = Array.from(row.querySelectorAll('td'));
-            // Pega o conteúdo de texto, excluindo as duas últimas colunas (Status e Ação)
-            return cells.slice(0, -2).map(cell => cell.textContent.trim()); 
+            return cells.slice(0, -2).map((cell, index) => {
+                // A coluna Telefone (index 2) precisa do texto sem o link do WhatsApp
+                if (index === 2) { 
+                    const text = cell.firstChild ? cell.firstChild.textContent.trim() : cell.textContent.trim();
+                    return text.replace('N/A', '').trim();
+                }
+                return cell.textContent.trim();
+            }); 
         });
 
         doc.setFontSize(16);
         doc.setTextColor(50, 50, 50); 
-        doc.text("Relatório de Reservas - Traços Culturais", 140, 15, { align: "center" });
+        doc.text("Relatório de Reservas - Festa da Família", 140, 15, { align: "center" });
         doc.setFontSize(10);
         doc.text(`Reservas no Relatório: ${linhasVisiveis.length} transações`, 140, 22, { align: "center" });
 
@@ -390,93 +1302,12 @@ const firebaseConfig = {
             body: dados,
             theme: 'grid',
             styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
-            headStyles: { fillColor: [0, 123, 255], textColor: 255 } // Cor azul do tema
+            headStyles: { fillColor: [0, 123, 255], textColor: 255 } 
         });
 
-        doc.save(`Reservas_Tracos_Culturais_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
+        doc.save(`Reservas_Tracos_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
     }
 
-    // ----------------------------------------------------
-    // FUNÇÃO DE CONFIRMAÇÃO (MANTIDA)
-    // ----------------------------------------------------
-    window.confirmarPagamento = async function(mesaPrincipalId) {
-        const confirmacao = confirm(`Tem certeza que deseja CONFIRMAR o pagamento para a reserva da MESA ${mesaPrincipalId}?`);
-        
-        if (confirmacao) {
-            try {
-                const reservaParaConfirmar = dadosAgrupados.find(r => r.mesas[0] === mesaPrincipalId);
-                
-                if (!reservaParaConfirmar) {
-                    alert('Erro: Reserva não encontrada localmente.');
-                    return;
-                }
-
-                const mesasIds = reservaParaConfirmar.mesas;
-                const updates = {};
-                
-                // Manda a atualização de status para CADA mesa do grupo
-                mesasIds.forEach(mesaId => {
-                    updates[`/reservas/${mesaId}/status`] = 'confirmado';
-                });
-
-                // A função update no nó raiz (ref(db)) é o que requer a regra específica de escrita
-                await update(ref(db), updates); 
-                
-                alert(`Pagamento CONFIRMADO para as mesas: ${mesasIds.join(', ')}.`);
-
-            } catch (error) {
-                // A mensagem de ERRO foi mantida para auxiliar no debug das regras
-                if (error.code === 'PERMISSION_DENIED') {
-                    alert("ERRO: O status não foi atualizado. Verifique se as novas Regras de Segurança foram PUBLICADAS no Firebase.");
-                } else {
-                    alert(`Erro ao confirmar pagamento: ${error.message}`);
-                }
-                console.error("Erro no Firebase:", error);
-            }
-        }
-    }
-    
-    // ----------------------------------------------------
-    // CONEXÃO COM FIREBASE (BUSCA INICIAL)
-    // ----------------------------------------------------
-    
-    onValue(ref(db, "reservas"), (snapshot) => {
-      loadingDiv.style.display = 'none';
-      dadosAgrupados = [];
-
-      const reservasData = snapshot.val();
-      if (!reservasData) {
-        renderizarTabela([]);
-        return;
-      }
-
-      // Agrupamento de mesas continua necessário
-      const reservasMap = new Map();
-
-      for (const mesaId in reservasData) {
-        const reserva = reservasData[mesaId];
-        if (!reserva.status) reserva.status = 'pendente'; 
-        
-        // Chave de Agrupamento: Usa todos os dados para identificar uma reserva única
-        const chaveReserva = `${reserva.aluno}-${reserva.nome}-${reserva.data}-${reserva.horario}-${reserva.valorTotal}`;
-        
-        if (!reservasMap.has(chaveReserva)) {
-          reservasMap.set(chaveReserva, {
-            ...reserva,
-            mesas: [mesaId]
-          });
-        } else {
-          reservasMap.get(chaveReserva).mesas.push(mesaId);
-        }
-      }
-      
-      dadosAgrupados = Array.from(reservasMap.values());
-      ordenarTabela(sortColumn, sortDirection);
-
-    }, (error) => {
-      loadingDiv.textContent = `ERRO FATAL: ${error.message}.`;
-      console.error("Firebase Error:", error);
-    });
   </script>
 </body>
 </html>
