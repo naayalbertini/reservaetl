@@ -128,7 +128,7 @@
     }
 
     .title-box .subtitle::before{
-        content:"🌽";
+        content:"";
     }
 
     /* LEGENDA */
@@ -163,6 +163,34 @@
         text-transform:uppercase;
     }
 
+    .legend-disponivel{background:linear-gradient(145deg,#49bd7b,#2f9e62) !important;}
+    .legend-reservada{background:linear-gradient(145deg,#de5a50,#c93d32) !important;}
+    .legend-selecionada{background:linear-gradient(145deg,#2f7db8,#1f5f8b) !important;}
+    .legend-cancelamento{background:linear-gradient(145deg,#9aa4af,#7b8490) !important;}
+
+    .resumo-selecao{
+        max-width:900px;
+        width:100%;
+        margin:-18px auto 26px;
+        padding:14px 18px;
+        border-radius:18px;
+        background:rgba(255,255,255,.82);
+        border:1px solid var(--line);
+        color:var(--blue-dark);
+        font-weight:800;
+        text-align:center;
+        box-shadow:var(--soft-shadow);
+        position:relative;
+        z-index:1;
+    }
+
+    .form-hint{
+        margin-top:6px;
+        color:var(--muted);
+        font-size:.82rem;
+        line-height:1.35;
+    }
+
     /* AVISOS */
     .aviso{
         max-width:860px !important;
@@ -195,7 +223,7 @@
         margin:26px auto 34px;
         padding:20px;
         display:grid;
-        grid-template-columns:repeat(8,1fr);
+        grid-template-columns:repeat(7,1fr);
         gap:10px;
         border-radius:28px;
         background:rgba(255,255,255,.78);
@@ -660,24 +688,28 @@
         <img src="img/tracos.png" alt="Escola Traços e Letras">
         <div class="title-box">
             <h1>Traços Culturais</h1>
+            <span class="subtitle">• Reserva de Mesas</span>
         </div>
         <img src="img/gaudi.png" alt="Colégio Antoni Gaudí"> 
     </div>
 
-<div class="status-legend">
-    <div style="background-color: #28a745; color: white;">
-        🟩 <span>DISPONÍVEL</span>
-    </div>
-    <div style="background-color: #dc3545; color: white;">
-        🟥 <span>RESERVADA</span>
-    </div>
+<div class="status-legend" aria-label="Legenda de status das mesas">
+    <div class="legend-item legend-disponivel">🟩 <span>DISPONÍVEL</span></div>
+    <div class="legend-item legend-reservada">🟥 <span>RESERVADA</span></div>
+
 </div>
 
 <div class="aviso" style="max-width: 650px; width: 100%; margin: 15px auto;">
     <strong>Atenção:</strong> Caso desista da compra ou repasse a mesa para outra pessoa, informe com urgência à secretaria escolar. Isso ajuda a manter a organização do Traços Culturais.
 </div>
 
+
+<div class="aviso" style="max-width: 700px; width: 100%; margin: 15px auto;">
+    <strong>Informativo importante:</strong> Caso o responsável pela mesa decida transferir, repassar ou vender a mesa para outro responsável/pai, é obrigatório informar imediatamente à secretaria escolar para atualização do cadastro e controle das reservas.
+</div>
+
 <div class="grid" id="mesas"></div>
+
 
 <div id="duplicateWarning" class="duplicate-warning" style="display: none;">
     </div>
@@ -689,7 +721,7 @@
             
             <p style="margin-top: 20px;"><strong>Valor Total:</strong> <span id="pixValor"></span></p>
             
-            <label for="chavePixInput" style="margin-top: 15px; margin-bottom: 5px; color: #ccc;">Chave Pix (CNPJ):</label>
+            <label for="chavePixInput" style="margin-top: 15px; margin-bottom: 5px; color: #344054;">Chave Pix (CNPJ):</label>
             <div class="pix-input-container">
                 <input type="text" id="chavePixInput" value="45.701.401/0001-07" readonly />
                 
@@ -737,10 +769,11 @@
         <input type="text" id="nome" required />
         
         <label for="telefone">📱 WhatsApp (Apenas números com DDD):</label>
-        <input type="tel" id="telefone" pattern="[0-9]{11,13}" required />
+        <input type="tel" id="telefone" pattern="[0-9]{11,13}" inputmode="numeric" placeholder="Ex: 71999998888" required />
+        <div class="form-hint">Digite somente números, com DDD.</div>
 
         <label for="cadeirasExtras">🪑 Quantidade de Cadeiras Extras (R$ 10,00 cada, máx. 2):</label>
-        <input type="number" id="cadeirasExtras" value="0" min="0" max="2" onchange="atualizarTotal()" />
+        <input type="number" id="cadeirasExtras" value="0" min="0" max="2" inputmode="numeric" onchange="atualizarTotal()" oninput="atualizarTotal()" />
         <div class="aviso">
             <strong>Limite de cadeiras extras:</strong> cada reserva pode adicionar até 2 cadeiras extras. Essa regra ajuda a manter o salão organizado e confortável para todos.
         </div>
@@ -748,37 +781,7 @@
         <button type="submit">Confirmar Reserva</button>
     </form>
     
-    <div style="margin-top: 20px; text-align: center; max-width: 500px; width: 100%;">
-        <button onclick="toggleCancelamentoForm()" style="
-            background: none; 
-            border: 1px solid #dc3545; 
-            color: #dc3545; 
-            padding: 10px 20px; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 1rem;
-            width: 100%;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-        ">Precisa Cancelar Sua Reserva? Clique Aqui</button>
-    </div>
     
-    <form id="formCancelamento" style="margin-top: 20px; max-width: 500px; width: 100%; display: none;">
-        <h3 style="color: #163f63; margin-top:0;">Solicitar Cancelamento de Reserva</h3>
-        <p style="font-size: 0.9rem; color: #ccc;">Para solicitar o cancelamento, <strong>confirme o nome e o telefone cadastrados</strong> e informe o número de uma das mesas reservadas.</p>
-
-        <label for="cancelamentoNome">👤 Nome Completo do Responsável (Exatamente como na reserva):</label>
-        <input type="text" id="cancelamentoNome" required />
-
-        <label for="cancelTelefone">📱 WhatsApp do Responsável (Exatamente como na reserva):</label>
-        <input type="tel" id="cancelTelefone" pattern="[0-9]{11,13}" required />
-
-        <label for="cancelMesa">Número de uma Mesa Reservada (ex: 05):</label>
-        <input type="text" id="cancelMesa" pattern="[0-9]{1,2}" required />
-
-        <button type="submit" style="background: linear-gradient(145deg, #dc3545, #a02030); color: white;">Solicitar Cancelamento</button>
-    </form>
 
     <script type="module">
         import { get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -808,7 +811,8 @@
         const form = document.getElementById("formReserva");
         const formCancelamento = document.getElementById("formCancelamento");
         const totalDiv = document.getElementById("total");
-        const duplicateWarningDiv = document.getElementById("duplicateWarning"); 
+        const duplicateWarningDiv = document.getElementById("duplicateWarning");
+        const resumoSelecao = document.getElementById("resumoSelecao"); 
 
         const VALOR_MESA = 150.00;
         const VALOR_CADEIRA = 10.00; 
@@ -823,6 +827,13 @@
             
             const valor = valorMesas + valorCadeiras;
             totalDiv.textContent = `Total: R$ ${valor.toFixed(2).replace('.', ',')}`;
+
+            const mesasTexto = Array.from(selecionadas).sort().join(', ');
+            if (resumoSelecao) {
+                resumoSelecao.textContent = selecionadas.size
+                    ? `Selecionadas: Mesa(s) ${mesasTexto} • ${selecionadas.size} mesa(s) • ${cadeirasExtras} cadeira(s) extra(s)`
+                    : 'Nenhuma mesa selecionada.';
+            }
         }
         
         // Função para normalizar strings (remove acentos, toUpperCase)
@@ -853,7 +864,7 @@
                     Não é necessário reservar novamente.
                 </p>
                 <button class="proceed-button" onclick="continueReservation()">
-                    Deseja prosseguir com uma **nova reserva** para este aluno mesmo assim?
+                    Entendi, quero revisar e confirmar uma nova reserva
                 </button>
             `;
             duplicateWarningDiv.style.display = 'block';
@@ -869,8 +880,8 @@
             duplicateWarningDiv.style.display = 'none'; // Oculta o aviso
             form.style.display = 'block'; // Mostra o formulário
             
-            // Força a re-submissão do formulário. 
-            form.requestSubmit(); 
+            // Reabre o formulário para o responsável revisar antes de confirmar novamente.
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
 
@@ -884,10 +895,10 @@
             
             mesasContainer.innerHTML = "";
             for (let i = 0; i < totalMesas; i++) {
-                const posicao = i % 7; 
+                const posicao = i % 6;
 
-                // Adiciona um bloco vazio a cada 4 mesas para simular o corredor
-                if (posicao === 4) { 
+                // Layout do salão: 3 mesas à esquerda + corredor + 3 mesas à direita
+                if (posicao === 3) {
                     const espaco = document.createElement("div");
                     espaco.className = "mesa espaco";
                     mesasContainer.appendChild(espaco);
@@ -896,9 +907,11 @@
                 const numero = (i + 1).toString().padStart(2, '0');
                 const div = document.createElement("div");
                 div.className = "mesa";
+                div.setAttribute('role', 'button');
+                div.setAttribute('tabindex', '0');
                 
                 // === BLOCO: RESERVA ESPECIAL PARA A ESCOLA (Mesas 01, 02, 03, 04) ===
-                const mesasDaEscola = ['01', '02', '03', '04'];
+                const mesasDaEscola = ['01', '02', '03'];
                 if (mesasDaEscola.includes(numero)) {
                     div.textContent = 'MESA DA ESCOLA'; 
                     div.classList.add("reservada"); 
@@ -925,7 +938,7 @@
                     
                 } else {
                     if (selecionadas.has(numero)) div.classList.add("selecionada");
-                    div.addEventListener("click", () => {
+                    const alternarSelecao = () => {
                         // Se estiver selecionando, remove o aviso e mostra o formulário
                         if (duplicateWarningDiv.style.display === 'block') {
                             duplicateWarningDiv.style.display = 'none';
@@ -936,6 +949,13 @@
                         else selecionadas.add(numero);
                         atualizarGrid();
                         atualizarTotal(); 
+                    };
+                    div.addEventListener("click", alternarSelecao);
+                    div.addEventListener("keydown", (event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            alternarSelecao();
+                        }
                     });
                 }
 
@@ -944,6 +964,7 @@
         }
 
         onValue(ref(db, "reservas"), (snapshot) => {
+            Object.keys(reservas).forEach(key => delete reservas[key]);
             Object.assign(reservas, snapshot.val() || {});
             atualizarGrid();
             atualizarTotal();
@@ -1059,6 +1080,20 @@
             }
 
             const reservaBase = reservas[mesaInput];
+
+            const nomeReserva = normalizeString(reservaBase.nome);
+            const nomeDigitado = normalizeString(nomeInput);
+            const telefoneReserva = String(reservaBase.telefone || '').replace(/[^0-9]/g, '');
+
+            if (nomeReserva !== nomeDigitado || telefoneReserva !== telefoneInput) {
+                alert('❌ Nome ou WhatsApp não correspondem à reserva informada. Confira os dados exatamente como foram cadastrados.');
+                return;
+            }
+
+            if (reservaBase.status === 'cancelamento-solicitado') {
+                alert('⚠️ Esta reserva já possui uma solicitação de cancelamento em análise.');
+                return;
+            }
             
             // Coleta o grupo de mesas
             const mesasParaCancelar = reservaBase.mesasSelecionadas; 
@@ -1078,9 +1113,8 @@
                 mesasParaCancelar.forEach(mesa => {
                     updates[`/reservas/${mesa}/status`] = 'cancelamento-solicitado';
                     updates[`/reservas/${mesa}/solicitacaoCancelamento`] = new Date().toLocaleString('pt-BR');
-                    // CAMPOS DE IDENTIDADE: ESSENCIAIS para passar na regra de segurança do Firebase
-                    updates[`/reservas/${mesa}/nome`] = nomeInput; 
-                    updates[`/reservas/${mesa}/telefone`] = telefoneInput; 
+                    updates[`/reservas/${mesa}/cancelamentoSolicitadoPor`] = nomeInput;
+                    updates[`/reservas/${mesa}/telefoneCancelamento`] = telefoneInput;
                 });
                 
                 await update(ref(db), updates);
